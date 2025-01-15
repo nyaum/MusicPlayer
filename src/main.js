@@ -13,6 +13,9 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 
 import BaseSvgTypePath from './components/svg/base/BaseSvgTypePath.vue'
 import SvgMusicSlash from './components/svg/svgs/SvgMusicSlash.vue'
+// import SvgRepeat from './components/svg/svgs/SvgRepeat.vue'
+// import SvgRepeatOne from './components/svg/svgs/SvgRepeatOne.vue'
+// import SvgShuffle from './components/svg/svgs/SvgShuffle.vue'
 
 const app = createApp(App)
 library.add(
@@ -23,6 +26,9 @@ library.add(
 app.component('font-awesome-icon', FontAwesomeIcon)
 app.component('base-svg-type-path', BaseSvgTypePath)
 app.component('music-slash', SvgMusicSlash)
+// app.component('repeat-track', SvgRepeat)
+// app.component('repeat-one-track', SvgRepeatOne)
+// app.component('shuffle-track', SvgShuffle)
 app.mount("#app")
 
 //createApp(App).mount('#app')
