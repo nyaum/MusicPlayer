@@ -18,8 +18,8 @@
 
                   <img class="rounded w-100 d-block" v-if="currentTrack" :src="currentTrack.albumCover" :alt="currentTrack.track" />
 
-                  <div v-else class="rounded-2 flex-grow-1" >
-                    <base-svg-type-path viewBox="0 0 24 24" width="100" height="100" iconColor="var(--bs-secondary)" icon-name="music-slash" style="min-height: 450px;">
+                  <div v-else class="rounded-2" >
+                    <base-svg-type-path viewBox="0 0 24 24" width="100" height="100" iconColor="var(--bs-secondary)" style="min-height: 450px;">
                     <music-slash/>
                     </base-svg-type-path>
                   </div>
@@ -70,9 +70,10 @@
 
                 <!-- 볼륨 조절 -->
                 <div class="d-flex align-items-center">
-                  <Volume2 :stroke-width="2.5" class="flex-grow-0 me-3" />
+                  <VolumeOff v-if="mute" :stroke-width="2.5" class="flex-grow-0 me-3 text-dark pointer" @click="muteSound"/>
+                  <Volume2 v-else :stroke-width="2.5" class="flex-grow-0 me-3 text-dark pointer"  @click="muteSound"/>
                   <div class="flex-grow-1">
-                    <input type="range" class="form-range" step="10">
+                    <input type="range" class="form-range" step="10" v-model="volume"  :data-alt="volume">
                   </div>
                 </div>
                 <!-- 볼륨 조절 끝 -->
@@ -93,6 +94,7 @@
   import { ListMusic } from 'lucide-vue-next';
   import { Music2 } from 'lucide-vue-next';
   import { Volume2 } from 'lucide-vue-next';
+  import { VolumeOff } from 'lucide-vue-next';
 
 </script>
 
@@ -102,28 +104,34 @@
     data() {
       return {
         playlist : [
-          {
-            track : 'Without me',
-            artist : 'Eminem',
-            albumCover : 'https://image.bugsm.co.kr/album/images/500/246/24633.jpg'
-          },
-          {
-            track : 'Viva la Vida',
-            artist : 'Coldplay',
-            albumCover : 'https://i.namu.wiki/i/Oa3FTKskSyIy6rbnerWoR1vM-Ar_t4PwHGVgqaRD34bjJlIO7L-zwQuUsm-D4J45AQ-JooKJ_UFXlmyYvJAx6Q.webp'
-          },
-          {
-            track : 'Stan',
-            artist : 'Eminem',
-            albumCover : 'https://i.scdn.co/image/ab67616d0000b273dbb3dd82da45b7d7f31b1b42'
-          }
+          // {
+          //   track : 'Without me',
+          //   artist : 'Eminem',
+          //   albumCover : 'https://image.bugsm.co.kr/album/images/500/246/24633.jpg',
+          //   audio : ''
+          // },
+          // {
+          //   track : 'Viva la Vida',
+          //   artist : 'Coldplay',
+          //   albumCover : 'https://i.namu.wiki/i/Oa3FTKskSyIy6rbnerWoR1vM-Ar_t4PwHGVgqaRD34bjJlIO7L-zwQuUsm-D4J45AQ-JooKJ_UFXlmyYvJAx6Q.webp',
+          //   audio : ''
+          // },
+          // {
+          //   track : 'Stan',
+          //   artist : 'Eminem',
+          //   albumCover : 'https://i.scdn.co/image/ab67616d0000b273dbb3dd82da45b7d7f31b1b42',
+          //   audio : ''
+          // }
         ],
         currentIndex : 0, // 현재 재생중인 노래의 인덱스 값
         play : false, // 재생중?
         repeat : -1, // 반복 재생?  -1 > false / 0 > 전체 반복 / 1 > 한 곡 반복
         shuffle : false, // 랜덤 재생?  false > 정상 재생 / true > 무작위 재생
         repeatColor : 'var(--bs-secondary)',
-        shuffleColor : 'var(--bs-secondary)'
+        shuffleColor : 'var(--bs-secondary)',
+        mute : false,
+        volume: 50,  // 초기 볼륨 값
+        prevVolume: 50,  // 음소거 이전 볼륨 값
       }
     },
     computed : {
@@ -204,6 +212,23 @@
       },
       playTrack() {
         this.play = !this.play; // 플레이 버튼 누르면 true false 반대로 바꾸기
+      },
+      muteSound() {
+        
+        // 음소거 버튼 클릭시 원래 값은 저장해둬야함
+        if (this.mute) {
+          // 원래 볼륨값 가져오기
+          this.volume = this.prevVolume;
+        }
+        else
+        {
+          // 지금 볼륨값을 저장해두고, 실제 볼륨을 0으로 변경
+          this.prevVolume = this.volume;
+          this.volume = 0
+        }
+
+        this.mute = !this.mute // 음소거 버튼 누르면 boolean 변경
+
       }
     }
   }
