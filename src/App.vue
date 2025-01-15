@@ -7,7 +7,7 @@
             <div id="nowPlay" class="card container-fluid p-0 w-50">
               
               <div class="card-header border-0">
-                <Music2 class="float-start text-secondary fs-5" :stroke-width="2.5"  />
+                <Search class="float-start text-secondary fs-5 pointer" :stroke-width="2.5"  />
                 <ListMusic class="float-end text-secondary fs-5 pointer" :stroke-width="2.5" />
               </div>
 
@@ -92,9 +92,9 @@
   import { Repeat1 } from 'lucide-vue-next';
   import { Shuffle } from 'lucide-vue-next';
   import { ListMusic } from 'lucide-vue-next';
-  import { Music2 } from 'lucide-vue-next';
   import { Volume2 } from 'lucide-vue-next';
   import { VolumeOff } from 'lucide-vue-next';
+  import { Search } from 'lucide-vue-next';
 
 </script>
 
@@ -104,24 +104,24 @@
     data() {
       return {
         playlist : [
-          // {
-          //   track : 'Without me',
-          //   artist : 'Eminem',
-          //   albumCover : 'https://image.bugsm.co.kr/album/images/500/246/24633.jpg',
-          //   audio : ''
-          // },
-          // {
-          //   track : 'Viva la Vida',
-          //   artist : 'Coldplay',
-          //   albumCover : 'https://i.namu.wiki/i/Oa3FTKskSyIy6rbnerWoR1vM-Ar_t4PwHGVgqaRD34bjJlIO7L-zwQuUsm-D4J45AQ-JooKJ_UFXlmyYvJAx6Q.webp',
-          //   audio : ''
-          // },
-          // {
-          //   track : 'Stan',
-          //   artist : 'Eminem',
-          //   albumCover : 'https://i.scdn.co/image/ab67616d0000b273dbb3dd82da45b7d7f31b1b42',
-          //   audio : ''
-          // }
+          {
+            track : 'Without me',
+            artist : 'Eminem',
+            albumCover : 'https://image.bugsm.co.kr/album/images/500/246/24633.jpg',
+            audio : ''
+          },
+          {
+            track : 'Viva la Vida',
+            artist : 'Coldplay',
+            albumCover : 'https://i.namu.wiki/i/Oa3FTKskSyIy6rbnerWoR1vM-Ar_t4PwHGVgqaRD34bjJlIO7L-zwQuUsm-D4J45AQ-JooKJ_UFXlmyYvJAx6Q.webp',
+            audio : ''
+          },
+          {
+            track : 'Stan',
+            artist : 'Eminem',
+            albumCover : 'https://i.scdn.co/image/ab67616d0000b273dbb3dd82da45b7d7f31b1b42',
+            audio : ''
+          }
         ],
         currentIndex : 0, // 현재 재생중인 노래의 인덱스 값
         play : false, // 재생중?
