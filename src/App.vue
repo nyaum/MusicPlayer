@@ -3,12 +3,24 @@
 
 
   <div id="bg-container" class="position-relative top-0">
-    <div id="bg-cover" class="position-absolute w-100 h-100" :style="{backgroundImage: currentTrack ? `url(${currentTrack.albumCover})` : 'none', }"></div>
-    <div class="d-flex">
-      <img id="currentCover" class="position-absolute shadow-lg rounded-4 z-1 h-auto" v-if="currentTrack" :src="currentTrack.albumCover" :alt="currentTrack.track" />
+    <div id="bg-cover" class="position-absolute w-100 h-100" :style="{backgroundImage: currentTrack ? `url(${currentTrack.albumCover})` : 'none'}"></div>
+    <div class="d-flex align-items-center justify-content-center" style="height: 100vh;">
+      <img id="currentCover" class="shadow-lg rounded-4 z-1 h-auto" v-if="currentTrack" :src="currentTrack.albumCover" :alt="currentTrack.track" />
+      <div v-if="currentTrack" class="ms-3 text-white">
+        <h3>
+          <strong class="mix-blend">{{ track }}</strong>
+        </h3>
+        <h5>
+          <small class="mix-blend">{{ artist }}</small>
+        </h5>
+        <h5>
+          <small class="mix-blend">{{ album }}</small>
+        </h5>
+      </div>
     </div>
   </div>
 
+  <!-- 하단 바 -->
   <div class="navbar bg-dark navbar-dark fixed-bottom py-0 row" style="box-shadow: 0 0 10px rgba(0,0,0,.5) !important; ">
     
     <!-- 재생 바 -->
@@ -246,25 +258,28 @@
   }
 
   #bg-container {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-}
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  #bg-cover {
+    left: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(8px);
+    z-index: -1;
+  }
+  
+  #currentCover {
+    width: 300px;
+    height: 300px;
+    background-size: cover;
+    background-position: center;
+  }
 
-#bg-cover {
-  left: 0;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: blur(8px);
-  z-index: -1;
-}
-
-#currentCover {
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 300px;
-}
-
+  .mix-blend{
+    mix-blend-mode: overlay;
+  }
 </style>
