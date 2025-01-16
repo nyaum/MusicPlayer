@@ -18,6 +18,7 @@ import SvgMusicSlash from './components/svg/svgs/SvgMusicSlash.vue'
 // import SvgShuffle from './components/svg/svgs/SvgShuffle.vue'
 
 const app = createApp(App)
+
 library.add(
     fas,
     far,

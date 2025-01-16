@@ -1,75 +1,90 @@
 
 <template>
+  <div class="container vh-100 w-100">
+    <div class="row align-items-center h-100">
+      <div class="col-lg-10 mx-auto">
+          <div class="jumbotron">
+            
+            <!-- 뮤직 플레이어 -->
+            <div id="nowPlay" class="card container-fluid p-0 w-50">
+              
+              <div class="card-header border-0 d-flex">
+                <Search class="text-secondary fs-5 pointer me-auto" :stroke-width="2.5" @click="searchVisible" />
+                <ListMusic class="text-secondary fs-5 pointer ms-auto" :stroke-width="2.5" />
+              </div>
 
+              <div class="card-body p-4">
 
-  <div id="bg-container" class="position-relative top-0">
-    <div id="bg-cover" class="position-absolute w-100 h-100" :style="{backgroundImage: currentTrack ? `url(${currentTrack.albumCover})` : 'none', }"></div>
-    <div class="d-flex">
-      <img id="currentCover" class="position-absolute shadow-lg rounded-4 z-1 h-auto" v-if="currentTrack" :src="currentTrack.albumCover" :alt="currentTrack.track" />
-    </div>
-  </div>
+                <!-- 곡 정보 -->
+                <div id="cover" class="p-1 rounded-2 text-center border d-flex justify-content-center align-items-center">
 
-  <div class="navbar bg-dark navbar-dark fixed-bottom py-0 row" style="box-shadow: 0 0 10px rgba(0,0,0,.5) !important; ">
-    
-    <!-- 재생 바 -->
-    <div id="current" class="progress w-100 rounded-0" style="height:6px">
-      <div class="progress-bar bg-primary" style="width:70%"></div>
-    </div>
-    <!-- 재생 바 끝 -->
+                  <img class="rounded w-100 d-block" v-if="currentTrack" :src="currentTrack.albumCover" :alt="currentTrack.track" />
 
-    <!-- 노래 컨트롤 -->
-    <div id="control" class="d-inline-flex py-2 align-items-center">
+                  <div v-else class="rounded-2" >
+                    <base-svg-type-path viewBox="0 0 24 24" width="100" height="100" iconColor="var(--bs-secondary)" style="min-height: 450px;">
+                    <music-slash/>
+                    </base-svg-type-path>
+                  </div>
+                  
+                </div>
+                
+                <hr>
 
-      <!-- 노래 정보 -->
-      <div class="col d-inline-flex" style="min-width:300px">
-        <div id="cover" class="d-inline-flex rounded-2">
+                <h5>
+                  <strong>{{ track }}</strong>
+                </h5>
+                
+                <span>
+                  <small class="text-secondary">{{ artist }}</small>
+                </span>
+                <!-- 곡 정보 끝 -->
 
-          <img class="rounded ms-2" width="64" height="64" v-if="currentTrack" :src="currentTrack.albumCover" :alt="currentTrack.track" />
+                <!-- 재생 바 -->
+                <div id="current" class="progress mt-3">
+                  <div class="progress-bar bg-dark" style="width:70%"></div>
+                </div>
+                <!-- 재생 바 끝 -->
 
-          <div v-else class="rounded-2" >
-            <base-svg-type-path viewBox="0 0 24 24" width="64" height="64" iconColor="var(--bs-secondary)">
-            <music-slash/>
-            </base-svg-type-path>
-          </div>
+                <!-- 노래 컨트롤 -->
+                <div id="control" class="row my-4 text-center align-items-center">
 
-          <div class="text-light ms-3">
-            <h5 class="ellipsis">
-              <strong>{{ track }}</strong>
-            </h5>
-            <h6 class="ellipsis">
-              <small>{{ artist }}</small>
-            </h6>
-          </div>
+                  <div class="col">
+                    <Shuffle :style="{color : shuffleColor}" class="fs-5" role="button" @click="shuffleTrack" :stroke-width="2.5" />
+                  </div>
 
-        </div>
+                  <div class="col">
+                    <font-awesome-icon :icon="['fas', 'backward-step']" class="fs-1" role="button" @click="prevTrack"/>
+                  </div>
+                  <div class="col">
+                    <font-awesome-icon :icon="trackStatus" class="fs-1" role="button" @click="playTrack"/>
+                  </div>
+                  <div class="col">
+                    <font-awesome-icon :icon="['fas', 'forward-step']" class="fs-1" role="button" @click="nextTrack"/>
+                  </div>
+
+                  <div class="col">
+                    <Repeat v-if="repeat != 1" :style="{color : repeatColor}" class="fs-5" role="button" @click="repeatTrack" :stroke-width="2.5" />
+                    <Repeat1 v-else role="button" @click="repeatTrack" :stroke-width="2.5" />
+                  </div>
+
+                </div>
+                <!-- 노래 컨트롤 끝 -->
+
+                <!-- 볼륨 조절 -->
+                <div class="d-flex align-items-center">
+                  <VolumeOff v-if="mute" :stroke-width="2.5" class="flex-grow-0 me-3 text-dark pointer" @click="muteSound"/>
+                  <Volume2 v-else :stroke-width="2.5" class="flex-grow-0 me-3 text-dark pointer"  @click="muteSound"/>
+                  <div class="flex-grow-1">
+                    <input type="range" class="form-range" step="10" v-model="volume"  :data-alt="volume">
+                  </div>
+                </div>
+                <!-- 볼륨 조절 끝 -->
+
+              </div>
+            </div>
+          </div>  
       </div>
-      <!-- 노래 정보 끝 -->
-
-      <!-- 컨트롤 바 -->
-      <div class="col d-inline-flex">
-        <Shuffle :style="{color : shuffleColor}" class="fs-5 ms-auto me-5" role="button" @click="shuffleTrack" :stroke-width="2.5" />
-        
-        <font-awesome-icon :icon="['fas', 'backward-step']" class="fs-3 text-light me-5" role="button" @click="prevTrack"/>
-        <font-awesome-icon :icon="trackStatus" class="fs-3 text-light me-5" role="button" @click="playTrack"/>
-        <font-awesome-icon :icon="['fas', 'forward-step']" class="fs-3 text-light me-5" role="button" @click="nextTrack"/>
-
-        <Repeat v-if="repeat != 1" :style="{color : repeatColor}" class="fs-5 me-auto me-5" role="button" @click="repeatTrack" :stroke-width="2.5" />
-        <Repeat1 v-else role="button" :style="{color : repeatColor}" class="fs-5 me-auto" @click="repeatTrack" :stroke-width="2.5"/>
-      </div>
-      <!-- 컨트롤 바 끝 -->
-
-      <div class="col d-inline-flex">
-
-        <VolumeOff v-if="mute" :stroke-width="2.5" class="ms-auto me-3 text-light pointer" @click="muteSound"/>
-        <Volume2 v-else :stroke-width="2.5" class="ms-auto me-3 text-light pointer"  @click="muteSound"/>
-        <input type="range" class="form-range w-50" step="10" v-model="volume"  :data-alt="volume">
-
-        <ListMusic class="text-light fs-5 pointer ms-auto me-5" :stroke-width="2.5" />
-      </div>
-
     </div>
-    <!-- 노래 컨트롤 끝 -->
-
   </div>
 </template>
 
@@ -81,7 +96,7 @@
   import { ListMusic } from 'lucide-vue-next';
   import { Volume2 } from 'lucide-vue-next';
   import { VolumeOff } from 'lucide-vue-next';
-  // import { Search } from 'lucide-vue-next';
+  import { Search } from 'lucide-vue-next';
 
 </script>
 
@@ -97,31 +112,28 @@
           {
             track : 'Without me',
             artist : 'Eminem',
-            album : 'The Eminem Show',
             albumCover : 'https://image.bugsm.co.kr/album/images/500/246/24633.jpg',
             audio : ''
           },
           {
             track : 'Viva la Vida',
             artist : 'Coldplay',
-            album : 'Viva la Vida or Death and All His Friends',
             albumCover : 'https://i.namu.wiki/i/Oa3FTKskSyIy6rbnerWoR1vM-Ar_t4PwHGVgqaRD34bjJlIO7L-zwQuUsm-D4J45AQ-JooKJ_UFXlmyYvJAx6Q.webp',
             audio : ''
           },
           {
             track : 'Stan',
             artist : 'Eminem',
-            album : 'The Marshall Mathers LP',
             albumCover : 'https://i.scdn.co/image/ab67616d0000b273dbb3dd82da45b7d7f31b1b42',
             audio : ''
           }
         ],
         currentIndex : 0, // 현재 재생중인 노래의 인덱스 값
-        play : true, // 재생중?
+        play : false, // 재생중?
         repeat : -1, // 반복 재생?  -1 > false / 0 > 전체 반복 / 1 > 한 곡 반복
         shuffle : false, // 랜덤 재생?  false > 정상 재생 / true > 무작위 재생
-        repeatColor : 'var(--bs-light)',
-        shuffleColor : 'var(--bs-light)',
+        repeatColor : 'var(--bs-secondary)',
+        shuffleColor : 'var(--bs-secondary)',
         mute : false,
         volume: 50,  // 초기 볼륨 값
         prevVolume: 50,  // 음소거 이전 볼륨 값
@@ -130,16 +142,13 @@
     },
     computed : {
       currentTrack() {
-        return this.playlist.length ? this.playlist[this.currentIndex] : ''; // 인덱스 값을 받아오게 설정함
+        return this.playlist.length ? this.playlist[this.currentIndex] : null; // 인덱스 값을 받아오게 설정함
       },
       track() {
         return this.currentTrack?.track || '재생 중인 곡 없음';
       },
       artist(){
         return this.currentTrack?.artist || '알 수 없는 아티스트';
-      },
-      album(){
-        return this.currentTrack?.album || '알 수 없는 앨범';
       },
       trackStatus() {
         return this.play ? ['fas', 'pause'] : ['fas', 'play'];
@@ -191,20 +200,20 @@
 
         switch (this.repeat) {
           case 0 :
-            this.repeatColor = 'var(--bs-primary)'
+            this.repeatColor = 'var(--bs-dark)'
             break;
           case 1 :
-            this.repeatColor = 'var(--bs-primary)'
+            this.repeatColor = 'var(--bs-dark)'
             break;
           default :
-            this.repeatColor = 'var(--bs-light)'
+            this.repeatColor = 'var(--bs-secondary)'
         }
 
       },
       shuffleTrack() {
 
         this.shuffle = !this.shuffle; // 상태값 반대로 변경
-        this.shuffleColor = this.shuffle ? 'var(--bs-primary)' : 'var(--bs-light)';
+        this.shuffleColor = this.shuffle ? 'var(--bs-dark)' : 'var(--bs-secondary)';
 
       },
       playTrack() {
@@ -238,33 +247,4 @@
   body {background-color: var(--bs-secondary-color) !important; height: 100vh;}
   #nowPlay{min-width:400px;}
   .pointer {cursor: pointer;}
-  .ellipsis {
-    overflow: hidden; 
-    white-space: nowrap; 
-    text-overflow: ellipsis; 
-    max-width: 10vw;
-  }
-
-  #bg-container {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-}
-
-#bg-cover {
-  left: 0;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: blur(8px);
-  z-index: -1;
-}
-
-#currentCover {
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 300px;
-}
-
 </style>
