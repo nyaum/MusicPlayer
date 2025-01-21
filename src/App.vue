@@ -4,9 +4,22 @@
 
   <div id="bg-container" class="position-relative top-0">
     <div id="bg-cover" class="position-absolute w-100 h-100" :style="{backgroundImage: currentTrack ? `url(${currentTrack.albumCover})` : 'none'}"></div>
-    <div class="d-flex align-items-center justify-content-center" style="height: 100vh;">
-      <img id="currentCover" class="shadow-lg rounded-4 z-1 h-auto" v-if="currentTrack" :src="currentTrack.albumCover" :alt="currentTrack.track" />
-      <div v-if="currentTrack" class="ms-3 text-white">
+
+    <div class="position-absolute end-0 input-group input-group-sm w-25 float-end m-lg-3 mix-blend" style="min-width: 500px;">
+      <input class="form-control form-control-sm transparent-input" v-model="url" placeholder="유튜브 링크"/>
+      <button class="btn btn-sm btn-outline-light" @click="downloadVideo">
+        <Youtube class="text-danger" />
+      </button>
+    </div>
+
+    <div class="d-flex row align-items-center justify-content-center" style="height: 100vh;">
+      <img id="currentCover" class="col-lg-6 shadow-lg rounded-4 z-1 h-auto" v-if="currentTrack" :src="currentTrack.albumCover" :alt="currentTrack.track" />
+      <div v-else class="rounded-2" align="center">
+        <base-svg-type-path viewBox="0 0 24 24" width="256" height="256" iconColor="var(--bs-secondary)">
+        <music-slash/>
+        </base-svg-type-path>
+      </div>
+      <div v-if="currentTrack" class="col-lg-6 mb-5 me-3 me-lg-0 mb-lg-0 ms-3 text-white">
         <h3>
           <strong class="mix-blend">{{ track }}</strong>
         </h3>
@@ -33,7 +46,7 @@
     <div id="control" class="d-inline-flex py-2 align-items-center">
 
       <!-- 노래 정보 -->
-      <div class="col d-inline-flex" style="min-width:300px">
+      <div class="col d-inline-flex me-5">
         <div id="cover" class="d-inline-flex rounded-2">
 
           <img class="rounded ms-2" width="64" height="64" v-if="currentTrack" :src="currentTrack.albumCover" :alt="currentTrack.track" />
@@ -43,7 +56,7 @@
             <music-slash/>
             </base-svg-type-path>
           </div>
-
+          
           <div class="text-light ms-3">
             <h5 class="ellipsis">
               <strong>{{ track }}</strong>
@@ -58,7 +71,7 @@
       <!-- 노래 정보 끝 -->
 
       <!-- 컨트롤 바 -->
-      <div class="col d-inline-flex">
+      <div class="col d-inline-flex me-5">
         <Shuffle :style="{color : shuffleColor}" class="fs-5 ms-auto me-5" role="button" @click="shuffleTrack" :stroke-width="2.5" />
         
         <font-awesome-icon :icon="['fas', 'backward-step']" class="fs-3 text-light me-5" role="button" @click="prevTrack"/>
@@ -66,7 +79,7 @@
         <font-awesome-icon :icon="['fas', 'forward-step']" class="fs-3 text-light me-5" role="button" @click="nextTrack"/>
 
         <Repeat v-if="repeat != 1" :style="{color : repeatColor}" class="fs-5 me-auto me-5" role="button" @click="repeatTrack" :stroke-width="2.5" />
-        <Repeat1 v-else role="button" :style="{color : repeatColor}" class="fs-5 me-auto" @click="repeatTrack" :stroke-width="2.5"/>
+        <Repeat1 v-else role="button" :style="{color : repeatColor}" class="fs-5 me-5 me-auto" @click="repeatTrack" :stroke-width="2.5"/>
       </div>
       <!-- 컨트롤 바 끝 -->
 
@@ -74,9 +87,14 @@
 
         <VolumeOff v-if="mute" :stroke-width="2.5" class="ms-auto me-3 text-light pointer" @click="muteSound"/>
         <Volume2 v-else :stroke-width="2.5" class="ms-auto me-3 text-light pointer"  @click="muteSound"/>
-        <input type="range" class="form-range w-50" step="10" v-model="volume"  :data-alt="volume">
-
-        <ListMusic class="text-light fs-5 pointer ms-auto me-5" :stroke-width="2.5" />
+        <input type="range" class="form-range w-25 me-3 d-none d-lg-block" step="10" v-model="volume"  :data-alt="volume">
+        <div class="dropup">
+          <ListMusic class="text-light fs-5 pointer ms-auto me-5 dropdown-toggle" data-bs-toggle="dropdown" :stroke-width="2.5" />
+          <div class="dropdown-menu dropdown-menu-end">
+            
+          </div>
+        </div>
+        
       </div>
 
     </div>
@@ -84,7 +102,15 @@
 
   </div>
 </template>
-
+<style>
+    input.transparent-input{
+      background-color:transparent !important;
+      color:var(--bs-light) !important;
+    }
+    input.transparent-input::placeholder{
+       color: var(--bs-light) !important;
+    }
+</style>
 <script setup>
 
   import { Repeat } from 'lucide-vue-next';
@@ -93,7 +119,8 @@
   import { ListMusic } from 'lucide-vue-next';
   import { Volume2 } from 'lucide-vue-next';
   import { VolumeOff } from 'lucide-vue-next';
-  // import { Search } from 'lucide-vue-next';
+  import { Youtube } from 'lucide-vue-next';
+  import axios from 'axios';
 
 </script>
 
@@ -106,27 +133,27 @@
     data() {
       return {
         playlist : [
-          {
-            track : 'Without me',
-            artist : 'Eminem',
-            album : 'The Eminem Show',
-            albumCover : 'https://image.bugsm.co.kr/album/images/500/246/24633.jpg',
-            audio : ''
-          },
-          {
-            track : 'Viva la Vida',
-            artist : 'Coldplay',
-            album : 'Viva la Vida or Death and All His Friends',
-            albumCover : 'https://i.namu.wiki/i/Oa3FTKskSyIy6rbnerWoR1vM-Ar_t4PwHGVgqaRD34bjJlIO7L-zwQuUsm-D4J45AQ-JooKJ_UFXlmyYvJAx6Q.webp',
-            audio : ''
-          },
-          {
-            track : 'Stan',
-            artist : 'Eminem',
-            album : 'The Marshall Mathers LP',
-            albumCover : 'https://i.scdn.co/image/ab67616d0000b273dbb3dd82da45b7d7f31b1b42',
-            audio : ''
-          }
+          // {
+          //   track : 'Without Me',
+          //   artist : 'Eminem',
+          //   album : 'The Eminem Show',
+          //   albumCover : 'https://image.bugsm.co.kr/album/images/500/246/24633.jpg',
+          //   audio : ''
+          // },
+          // {
+          //   track : 'Viva la Vida',
+          //   artist : 'Coldplay',
+          //   album : 'Viva la Vida or Death and All His Friends',
+          //   albumCover : 'https://i.namu.wiki/i/Oa3FTKskSyIy6rbnerWoR1vM-Ar_t4PwHGVgqaRD34bjJlIO7L-zwQuUsm-D4J45AQ-JooKJ_UFXlmyYvJAx6Q.webp',
+          //   audio : ''
+          // },
+          // {
+          //   track : 'Stan',
+          //   artist : 'Eminem',
+          //   album : 'The Marshall Mathers LP',
+          //   albumCover : 'https://i.scdn.co/image/ab67616d0000b273dbb3dd82da45b7d7f31b1b42',
+          //   audio : ''
+          // }
         ],
         currentIndex : 0, // 현재 재생중인 노래의 인덱스 값
         play : true, // 재생중?
@@ -241,6 +268,26 @@
       },
       searchVisible() {
         this.searchInput = !this.searchInput
+      },
+      async downloadVideo() {
+        if (!this.url) {
+          this.message = "Please enter a URL.";
+          return;
+        }
+        try {
+          const response = await axios.post("http://localhost:5000/download", {
+            url: this.url,
+          });
+          
+          if (response.data.playlist) {
+
+            this.playlist.push(response.data.playlist);
+
+          }
+
+        } catch (error) {
+          this.message = error.response?.data?.error || "An error occurred.";
+        }
       }
     }
   }
@@ -280,6 +327,6 @@
   }
 
   .mix-blend{
-    mix-blend-mode: overlay;
+    mix-blend-mode: difference;
   }
 </style>
