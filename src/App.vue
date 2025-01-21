@@ -7,7 +7,8 @@
 
     <div class="position-absolute end-0 input-group input-group-sm w-25 float-end m-lg-3 mix-blend" style="min-width: 500px;">
       <input class="form-control form-control-sm transparent-input" v-model="url" placeholder="유튜브 링크"/>
-      <button class="btn btn-sm btn-outline-light" @click="downloadVideo">
+      <!-- <button class="btn btn-sm btn-outline-light" @click="downloadVideo"> -->
+      <button class="btn btn-sm btn-outline-light" @click="searchYT">
         <Youtube class="text-danger" />
       </button>
     </div>
@@ -102,15 +103,6 @@
 
   </div>
 </template>
-<style>
-    input.transparent-input{
-      background-color:transparent !important;
-      color:var(--bs-light) !important;
-    }
-    input.transparent-input::placeholder{
-       color: var(--bs-light) !important;
-    }
-</style>
 <script setup>
 
   import { Repeat } from 'lucide-vue-next';
@@ -182,7 +174,7 @@
       },
       trackStatus() {
         return this.play ? ['fas', 'pause'] : ['fas', 'play'];
-      }
+      },
     },
     methods : {
       nextTrack() {
@@ -288,6 +280,25 @@
         } catch (error) {
           this.message = error.response?.data?.error || "An error occurred.";
         }
+      },
+      create(){
+        console.log(process.env)
+      },
+      searchYT(){
+
+        const params = {
+          key:process.env.VUE_APP_YOUTUBE_DATA_API_KEY,
+          q: this.url,
+          part: "snippet",
+          type: "video",
+          maxResults: 5,
+          fields: "items(id,snippet(title,thumbnails),contentDetails.duration)",
+          videoEmbeddable: true,
+        };
+
+        const Data = axios.get("https://www.googleapis.com/youtube/v3/search", { params })
+
+        return Data;
       }
     }
   }
@@ -328,5 +339,12 @@
 
   .mix-blend{
     mix-blend-mode: difference;
+  }
+  input.transparent-input{
+    background-color:transparent !important;
+    color:var(--bs-light) !important;
+  }
+  input.transparent-input::placeholder{
+     color: var(--bs-light) !important;
   }
 </style>
