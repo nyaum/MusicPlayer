@@ -29,6 +29,22 @@ def download_video():
         filename = str(uuid.uuid4())
         filepath = os.path.join(DOWNLOAD_DIR, f'{filename}.%(ext)s')
 
+        # yt-dlp로 제목, 유튜브 링크 검색
+        result = subprocess.run(
+            ['yt-dlp',
+             '--default-search',
+             'ytsearch:', f'{url}', 
+             '--get-title',
+             '--get-id'],
+            capture_output=True,
+            text=True,
+        )
+
+        result = result.stdout.split('\n')
+
+        title = result[0]
+        url = f'https://www.youtube.com/watch?v={result[1]}'
+
         # yt-dlp 명령어 실행 (기본 검색 옵션 추가)
         result = subprocess.run(
             ['yt-dlp', 
@@ -43,7 +59,8 @@ def download_video():
              '--audio-format', 'mp3', 
              url, '-o', filepath],
             capture_output=True,
-            text=True
+            text=True,
+            encoding='utf-8'
         )
 
         if result.returncode == 0:
@@ -85,4 +102,4 @@ def download_video():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

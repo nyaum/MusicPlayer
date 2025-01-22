@@ -5,12 +5,37 @@
   <div id="bg-container" class="position-relative top-0">
     <div id="bg-cover" class="position-absolute w-100 h-100" :style="{backgroundImage: currentTrack ? `url(${currentTrack.albumCover})` : 'none'}"></div>
 
-    <div class="position-absolute end-0 input-group input-group-sm w-25 float-end m-lg-3 mix-blend" style="min-width: 500px;">
-      <input class="form-control form-control-sm transparent-input" v-model="url" placeholder="유튜브 링크"/>
+    <!-- 검색창 -->
+    <div class="dropdown position-absolute end-0 input-group input-group-sm w-25 float-end m-lg-3" style="min-width: 500px;">
+      <input class="form-control form-control-sm transparent-input" v-model="url" placeholder="노래 제목 입력"/>
       <!-- <button class="btn btn-sm btn-outline-light" @click="downloadVideo"> -->
-      <button class="btn btn-sm btn-outline-light" @click="searchYT">
+      <button class="btn btn-sm btn-outline-light rounded-end-1" @click="downloadVideo">
         <Youtube class="text-danger" />
       </button>
+      <!-- <ul class="dropdown-menu dropdown-menu-end w-100 shadow-lg" v-if="searchInput">
+        <li role="button" v-for="result in searchResults" :key="result.id" class="dropdown-item">
+          <table class="table m-0 w-100 bg-transparent" :data-yt-id="result.id">
+            <tbody>
+              <tr>
+                <td rowspan="3" class="col-2">
+                  <img :src="result.thumbnail" width="96" height="96" class="bg-transparent h-100"/>
+                </td>
+              </tr>
+              <tr>
+                <td class="col-10">
+                  <span class="bg-transparent">{{ result.title }}</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="col-10">
+                  <span class="bg-transparent">{{ result.publishedAt }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </li>
+        <li><h6 class="dropdown-header float-end py-0">최대 5개까지 출력됩니다</h6></li>
+      </ul> -->
     </div>
 
     <div class="d-flex row align-items-center justify-content-center" style="height: 100vh;">
@@ -50,7 +75,9 @@
       <div class="col d-inline-flex me-5">
         <div id="cover" class="d-inline-flex rounded-2">
 
-          <img class="rounded ms-2" width="64" height="64" v-if="currentTrack" :src="currentTrack.albumCover" :alt="currentTrack.track" />
+          <div class="img-wrapper" v-if="currentTrack">
+            <img class="rounded ms-2" width="64" height="64" :src="currentTrack.albumCover" :alt="currentTrack.track" />
+          </div>
 
           <div v-else class="rounded-2" >
             <base-svg-type-path viewBox="0 0 24 24" width="64" height="64" iconColor="var(--bs-secondary)">
@@ -59,10 +86,10 @@
           </div>
           
           <div class="text-light ms-3">
-            <h5 class="ellipsis">
+            <h5 class="">
               <strong>{{ track }}</strong>
             </h5>
-            <h6 class="ellipsis">
+            <h6 class="">
               <small>{{ artist }}</small>
             </h6>
           </div>
@@ -102,6 +129,7 @@
     <!-- 노래 컨트롤 끝 -->
 
   </div>
+  <audio id="audio" :src="currentTrack.audio" autoplay></audio>
 </template>
 <script setup>
 
@@ -113,15 +141,12 @@
   import { VolumeOff } from 'lucide-vue-next';
   import { Youtube } from 'lucide-vue-next';
   import axios from 'axios';
+  //import * as youtubeSearch from 'youtube-search';
 
 </script>
 
 <script>
   export default {
-    metaInfo :{
-      title: 'Default Title',
-      titleTemplate: '%s | MusicPlayer'
-    },
     data() {
       return {
         playlist : [
@@ -146,6 +171,33 @@
           //   albumCover : 'https://i.scdn.co/image/ab67616d0000b273dbb3dd82da45b7d7f31b1b42',
           //   audio : ''
           // }
+        ],
+        searchResults : [
+            // {
+            //   "id": "Ha-NRBE0HWo",
+            //   "title": "불후의명곡🔥🔥 | 나 없인 의미없지: Eminem - Without Me (2002) [가사해석/번역]",
+            //   "thumbnail": "https://i.ytimg.com/vi/Ha-NRBE0HWo/hqdefault.jpg"
+            // },
+            // {
+            //   "id": "Ha-NRBE0HWo",
+            //   "title": "불후의명곡🔥🔥 | 나 없인 의미없지: Eminem - Without Me (2002) [가사해석/번역]",
+            //   "thumbnail": "https://i.ytimg.com/vi/Ha-NRBE0HWo/hqdefault.jpg"
+            // },
+            // {
+            //   "id": "Ha-NRBE0HWo",
+            //   "title": "불후의명곡🔥🔥 | 나 없인 의미없지: Eminem - Without Me (2002) [가사해석/번역]",
+            //   "thumbnail": "https://i.ytimg.com/vi/Ha-NRBE0HWo/hqdefault.jpg"
+            // },
+            // {
+            //   "id": "Ha-NRBE0HWo",
+            //   "title": "불후의명곡🔥🔥 | 나 없인 의미없지: Eminem - Without Me (2002) [가사해석/번역]",
+            //   "thumbnail": "https://i.ytimg.com/vi/Ha-NRBE0HWo/hqdefault.jpg"
+            // },
+            // {
+            //   "id": "Ha-NRBE0HWo",
+            //   "title": "불후의명곡🔥🔥 | 나 없인 의미없지: Eminem - Without Me (2002) [가사해석/번역]",
+            //   "thumbnail": "https://i.ytimg.com/vi/Ha-NRBE0HWo/hqdefault.jpg"
+            // },
         ],
         currentIndex : 0, // 현재 재생중인 노래의 인덱스 값
         play : true, // 재생중?
@@ -286,19 +338,31 @@
       },
       searchYT(){
 
-        const params = {
-          key:process.env.VUE_APP_YOUTUBE_DATA_API_KEY,
-          q: this.url,
-          part: "snippet",
-          type: "video",
-          maxResults: 5,
-          fields: "items(id,snippet(title,thumbnails),contentDetails.duration)",
-          videoEmbeddable: true,
-        };
+        // var opts = {
+        //   maxResults: 5,
+        //   key: process.env.VUE_APP_YOUTUBE_DATA_API_KEY
+        // };
 
-        const Data = axios.get("https://www.googleapis.com/youtube/v3/search", { params })
+        // youtubeSearch(this.url, opts, (err, results) => {
 
-        return Data;
+        //   if(err) return console.log(err);
+
+        //   for (let i = 0; i < results.length; i++) {
+        //     const id = results[i].id;
+        //     const title = results[i].title;
+        //     const thumbnail = results[i].thumbnails.default.url;
+        //     const publishedAt = new Date(Date.parse(results[i].publishedAt)).toISOString().slice(0, 19).replace('T', ' ');
+
+        //     this.searchResults.push({
+        //       id: id,
+        //       title: title,
+        //       thumbnail: thumbnail,
+        //       publishedAt: publishedAt
+        //     });
+        //   }
+          
+        // });
+
       }
     }
   }
@@ -347,4 +411,21 @@
   input.transparent-input::placeholder{
      color: var(--bs-light) !important;
   }
+  .dropdown-item:active{
+    background-color: var(--bs-light) !important;
+  }
+
+  .img-wrapper{
+    position: relative;
+    width: 64px;
+    height: 64px;
+  }
+  .img-wrapper img{
+    top: 0;
+    left: 0;
+    height: 100%;
+    object-fit: cover;
+    margin: auto;
+  }
+
 </style>
